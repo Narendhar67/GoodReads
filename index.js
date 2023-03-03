@@ -38,3 +38,32 @@ app.get("/books/", async (request, response) => {
   const booksArray = await db.all(getBooksQuery);
   response.send(booksArray);
 });
+
+// Register User
+
+app.post("/users/", async (request, response) => {
+  const { name, username, password, gender, location } = request.body;
+  // creating encrypted Password
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const selectUserQuery = `SELECT * FROM user WHERE username = '${username}';`;
+  const dbRes = await db.get(selectUserQuery);
+  if (dbRes === undefined) {
+    // Create a new user
+    const createUserQuery = `INSERT INTO
+        user (name , username , password , gender , location)
+        VALUES (
+        '${name}',
+        '${username}',
+        '${hashedPassword}',
+        '${gender}',
+        '${location}'
+        );`;
+    const userDetails = await db.run(createUserQuery);
+    const newUserId = userDetails.lastID;
+    response.send(`Created new user with ${newUserId}`);
+  } else {
+    // user already exists
+    response.status = 400; // sending status code
+    response.send("User already exists");
+  }
+});
