@@ -79,7 +79,7 @@ app.post("/login/", async (request, response) => {
 
   if (dbRes === undefined) {
     // Invalid user
-    response.status = 400;
+    response.status(400);
     response.send("Invalid User");
   } else {
     // compare Password
@@ -87,7 +87,7 @@ app.post("/login/", async (request, response) => {
     if (isPasswordMatched) {
       response.send("Login Success");
     } else {
-      response.status = 400;
+      response.status(400);
       response.send("Invalid Password");
     }
   }
