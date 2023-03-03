@@ -39,7 +39,7 @@ app.get("/books/", async (request, response) => {
   response.send(booksArray);
 });
 
-// Register User
+// Register User API
 
 app.post("/users/", async (request, response) => {
   const { name, username, password, gender, location } = request.body;
@@ -60,10 +60,35 @@ app.post("/users/", async (request, response) => {
         );`;
     const userDetails = await db.run(createUserQuery);
     const newUserId = userDetails.lastID;
-    response.send(`Created new user with ${newUserId}`);
+    console.log(userDetails);
+    response.send(`Created new user with username : ${username},
+    and userId : ${newUserId}`);
   } else {
     // user already exists
     response.status = 400; // sending status code
     response.send("User already exists");
+  }
+});
+
+// Login user API
+
+app.post("/login/", async (request, response) => {
+  const { username, password } = request.body;
+  const selectUserQuery = `SELECT * FROM user WHERE username = '${username}';`;
+  const dbRes = await db.get(selectUserQuery);
+
+  if (dbRes === undefined) {
+    // Invalid user
+    response.status = 400;
+    response.send("Invalid User");
+  } else {
+    // compare Password
+    const isPasswordMatched = await bcrypt.compare(password, dbRes.password);
+    if (isPasswordMatched) {
+      response.send("Login Success");
+    } else {
+      response.status = 400;
+      response.send("Invalid Password");
+    }
   }
 });
