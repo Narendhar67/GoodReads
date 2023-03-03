@@ -65,7 +65,7 @@ app.post("/users/", async (request, response) => {
     and userId : ${newUserId}`);
   } else {
     // user already exists
-    response.status = 400; // sending status code
+    response.status(400); // sending status code
     response.send("User already exists");
   }
 });
